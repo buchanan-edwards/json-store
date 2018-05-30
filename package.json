@@ -1,0 +1,26 @@
+{
+  "name": "@be/json-store",
+  "version": "1.0.0",
+  "description": " Stores data as JSON files under a topic and an id.",
+  "main": "json-store.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/buchanan-edwards/json-store.git"
+  },
+  "keywords": [
+    "json",
+    "storage"
+  ],
+  "author": "Frank Hellwig <frank.hellwig@buchanan-edwards.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/buchanan-edwards/json-store/issues"
+  },
+  "homepage": "https://github.com/buchanan-edwards/json-store#readme",
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  }
+}
