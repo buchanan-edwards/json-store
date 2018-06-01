@@ -95,14 +95,31 @@ class JsonStore {
   }
 
   /**
-   * Deletes the file specified by the topic and the id. Returns true if the
-   * file was deleted. Otherwise, false is returned if the file does not exist.
+   * Moves the item specified by the topic and id to a new topid.
+   * The directory corresponding to the topic is deleted if empty.
+   * Returns true if successful, false is the original item was not found.
+   */
+  move(topic, id, newTopic) {
+    const data = this.get(topic, id);
+    if (data === undefined) {
+      return false;
+    } else {
+      this.put(newTopic, id, data);
+      return this.delete(topic, id);
+    }
+  }
+
+  /**
+   * Deletes the file specified by the topic and the id.
+   * The directory corresponding to the topic is deleted if empty.
+   * Returns true if the file was deleted, false if the file does not exist.
    */
   delete(topic, id) {
     _checkNonEmptyString(topic, 'topic');
     _checkNonEmptyString(id, 'id');
     try {
       fs.unlinkSync(this._pathname(topic, id));
+      this._deleteTopicIfEmpty(topic);
       return true;
     } catch (err) {
       if (err.code === ENOENT) {
@@ -115,6 +132,7 @@ class JsonStore {
 
   /**
    * Deletes all files for the specified topic and array of ids.
+   * The directory corresponding to the topic is deleted if empty.
    * Returns an array of all removed ids.
    */
   purge(topic, ids) {
@@ -127,12 +145,14 @@ class JsonStore {
         removed.push(id);
       }
     });
+    this._deleteTopicIfEmpty(topic);
     return removed;
   }
 
   /**
-   * Deletes all files for the specified topic. The directory corresponding
-   * to the topic is deleted if empty. Returns an array of all removed ids.
+   * Deletes all files for the specified topic.
+   * The directory corresponding to the topic is deleted if empty.
+   * Returns an array of all removed ids.
    */
   clean(topic) {
     _checkNonEmptyString(topic, 'topic');
@@ -141,13 +161,7 @@ class JsonStore {
       fs.unlinkSync(pathname);
       removed.push(id);
     });
-    try {
-      fs.rmdirSync(this._dirname(topic));
-    } catch (err) {
-      if (err.code !== ENOTEMPTY) {
-        throw err;
-      }
-    }
+    this._deleteTopicIfEmpty(topic);
     return removed;
   }
 
@@ -183,6 +197,16 @@ class JsonStore {
       if (err.code === ENOENT) {
         return; // no such topic - don't process any files
       } else {
+        throw err;
+      }
+    }
+  }
+
+  _deleteTopicIfEmpty(topic) {
+    try {
+      fs.rmdirSync(this._dirname(topic));
+    } catch (err) {
+      if (err.code !== ENOTEMPTY) {
         throw err;
       }
     }

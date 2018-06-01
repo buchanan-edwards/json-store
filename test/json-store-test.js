@@ -70,6 +70,16 @@ describe('JsonStore', function() {
       assert.deepStrictEqual(values, []);
     });
   });
+  describe('move', function() {
+    it('should move a file from one topic to another', function() {
+      store.move('colors', 'red', 'moved');
+      assert(store.get('colors', 'red') === undefined);
+      assert(store.get('moved', 'red') === 'The color red');
+      store.move('moved', 'red', 'colors'); // move it back again
+      assert(store.get('colors', 'red') === 'The color red');
+      assert(store.get('moved', 'red') === undefined);
+    });
+  });
   describe('delete', function() {
     it('should remove one file', function() {
       const shouldBeTrue = store.delete('colors', 'red');

@@ -60,7 +60,7 @@ Run `npm test` to perform unit testing.
 
 ### new JsonStore(basedir, extension)
 
-Creates a new JsonStore instance using the specified base directory, which *must* be an absolute path, as the storage location for all data.
+Creates a new JsonStore instance using the specified base directory, which _must_ be an absolute path, as the storage location for all data.
 
 ### get(topic, id)
 
@@ -82,13 +82,17 @@ Returns an object containing all items for the specified topic. The returned obj
 
 Returns an array of all items for the specifiec topic. This is the same as getting the values for the data returned by the all(topic) method.
 
+### move(topic, id, newTopic)
+
+Moves the item specified by the topic and id to a new topid. The directory corresponding to the topic is deleted if empty. Returns true if successful, false is the original item was not found.
+
 ### delete(topic, id)
 
-Deletes the file specified by the topic and the id. Returns true if the file was deleted. Otherwise, false is returned if the file does not exist.
+Deletes the file specified by the topic and the id. The directory corresponding to the topic is deleted if empty. Returns true if the file was deleted, false if the file does not exist.
 
 ### purge(topic, ids)
 
-Deletes all files for the specified topic and array of ids. Returns an array of all removed ids.
+Deletes all files for the specified topic and array of ids. The directory corresponding to the topic is deleted if empty. Returns an array of all removed ids.
 
 ### clean(topic)
 
