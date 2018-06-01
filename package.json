@@ -1,6 +1,6 @@
 {
   "name": "@be/json-store",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": " Stores data as JSON files under a topic and an id.",
   "main": "json-store.js",
   "scripts": {

@@ -2,6 +2,8 @@
 
 Stores data as JSON files under a topic and an id. Each topic maps to a directory and each id maps to a filename. All methods are synchronous.
 
+Version 1.0.1
+
 ## Usage
 
 ```bash
