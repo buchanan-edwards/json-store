@@ -84,7 +84,7 @@ Returns an array of all items for the specifiec topic. This is the same as getti
 
 ### move(topic, id, newTopic)
 
-Moves the item specified by the topic and id to a new topid. The directory corresponding to the topic is deleted if empty. Returns true if successful, false is the original item was not found.
+Moves the item specified by the topic and id to a new topic. The directory corresponding to the topic is deleted if empty. Returns true if successful, false is the original item was not found.
 
 ### delete(topic, id)
 
