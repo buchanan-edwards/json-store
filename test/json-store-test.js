@@ -71,31 +71,34 @@ describe('JsonStore', function() {
     });
   });
   describe('move', function() {
-    it('should move a file from one topic to another', function() {
+    it('should move files from one topic to another', function() {
       store.move('colors', 'red', 'moved');
+      store.move('colors', 'blue', 'moved');
       assert(store.get('colors', 'red') === undefined);
+      assert(store.get('colors', 'blue') === undefined);
       assert(store.get('moved', 'red') === 'The color red');
-      store.move('moved', 'red', 'colors'); // move it back again
+      assert(store.get('moved', 'blue') === 'The color blue');
+      const moved = store.move('moved', ['red', 'blue'], 'colors');
+      assert.deepStrictEqual(moved.sort(), ['blue', 'red']);
       assert(store.get('colors', 'red') === 'The color red');
+      assert(store.get('colors', 'blue') === 'The color blue');
       assert(store.get('moved', 'red') === undefined);
+      assert(store.get('moved', 'blue') === undefined);
     });
   });
   describe('delete', function() {
-    it('should remove one file', function() {
-      const shouldBeTrue = store.delete('colors', 'red');
-      assert(shouldBeTrue === true);
-      const shouldBeFalse = store.delete('colors', 'red');
-      assert(shouldBeFalse === false);
-      const values = store.values('colors');
+    it('should remove files from a topic', function() {
+      let deleted = store.delete('colors', 'red');
+      assert.deepStrictEqual(deleted, ['red']);
+      deleted = store.delete('colors', 'red');
+      assert.deepStrictEqual(deleted, []);
+      let values = store.values('colors');
       assert(values.length === 2);
-    });
-  });
-  describe('purge', function() {
-    it('should remove two files', function() {
-      const removed = store.purge('colors', ['red', 'green', 'blue']);
-      removed.sort();
-      assert.deepStrictEqual(removed, ['blue', 'green']);
-      const values = store.values('colors');
+      deleted = store.delete('no-such-topic', 'no-such-id');
+      assert.deepStrictEqual(deleted, []);
+      deleted = store.delete('colors', ['red', 'green', 'blue']);
+      assert.deepStrictEqual(deleted.sort(), ['blue', 'green']);
+      values = store.values('colors');
       assert.deepStrictEqual(values, []);
     });
   });

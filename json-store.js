@@ -95,58 +95,55 @@ class JsonStore {
   }
 
   /**
-   * Moves the item specified by the topic and id to a new topid.
-   * The directory corresponding to the topic is deleted if empty.
-   * Returns true if successful, false is the original item was not found.
+   * Moves the files specified by the topic and the ids to a new topic. If ids
+   * is a string instead of an array, then only that one file is moved. The
+   * directory corresponding to the topic is deleted if empty. Returns an array
+   * of moved ids regardless of the ids argument being a string or an array.
    */
-  move(topic, id, newTopic) {
-    const data = this.get(topic, id);
-    if (data === undefined) {
-      return false;
-    } else {
-      this.put(newTopic, id, data);
-      return this.delete(topic, id);
+  move(topic, ids, newTopic) {
+    if (typeof ids === 'string') {
+      ids = [ids];
     }
-  }
-
-  /**
-   * Deletes the file specified by the topic and the id.
-   * The directory corresponding to the topic is deleted if empty.
-   * Returns true if the file was deleted, false if the file does not exist.
-   */
-  delete(topic, id) {
     _checkNonEmptyString(topic, 'topic');
-    _checkNonEmptyString(id, 'id');
-    try {
-      fs.unlinkSync(this._pathname(topic, id));
-      this._deleteTopicIfEmpty(topic);
-      return true;
-    } catch (err) {
-      if (err.code === ENOENT) {
-        return false;
-      } else {
-        throw err;
+    _checkArray(ids);
+    _checkNonEmptyString(newTopic, 'newTopic');
+    const moved = [];
+    ids.forEach(id => {
+      const data = this.get(topic, id);
+      if (data !== undefined) {
+        this.put(newTopic, id, data);
+        moved.push(id);
       }
-    }
+    });
+    this.delete(topic, moved);
+    return moved;
   }
 
   /**
-   * Deletes all files for the specified topic and array of ids.
-   * The directory corresponding to the topic is deleted if empty.
-   * Returns an array of all removed ids.
+   * Deletes the files specified by the topic and the ids. If ids is a string
+   * instead of an array, then only that one file is deleted. The directory
+   * corresponding to the topic is deleted if empty. Returns an array of deleted
+   * ids regardless of the ids argument being a string or an array.
    */
-  purge(topic, ids) {
+  delete(topic, ids) {
+    if (typeof ids === 'string') {
+      ids = [ids];
+    }
     _checkNonEmptyString(topic, 'topic');
-    _checkArray(ids, 'ids');
-    const removed = [];
-    this._processFiles(topic, (pathname, id) => {
-      if (ids.includes(id)) {
-        fs.unlinkSync(pathname);
-        removed.push(id);
+    _checkArray(ids);
+    const deleted = [];
+    ids.forEach(id => {
+      try {
+        fs.unlinkSync(this._pathname(topic, id));
+        deleted.push(id);
+      } catch (err) {
+        if (err.code !== ENOENT) {
+          throw err;
+        }
       }
     });
     this._deleteTopicIfEmpty(topic);
-    return removed;
+    return deleted;
   }
 
   /**
@@ -206,7 +203,8 @@ class JsonStore {
     try {
       fs.rmdirSync(this._dirname(topic));
     } catch (err) {
-      if (err.code !== ENOTEMPTY) {
+      const ok = err.code === ENOENT || err.code === ENOTEMPTY;
+      if (!ok) {
         throw err;
       }
     }

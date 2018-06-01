@@ -2,7 +2,7 @@
 
 Stores data as JSON files under a topic and an id. Each topic maps to a directory and each id maps to a filename. All methods are synchronous.
 
-Version 1.0.1
+Version 1.0.2
 
 ## Usage
 
@@ -84,17 +84,13 @@ Returns an object containing all items for the specified topic. The returned obj
 
 Returns an array of all items for the specifiec topic. This is the same as getting the values for the data returned by the all(topic) method.
 
-### move(topic, id, newTopic)
+### move(topic, ids, newTopic)
 
-Moves the item specified by the topic and id to a new topic. The directory corresponding to the topic is deleted if empty. Returns true if successful, false is the original item was not found.
+Moves the files specified by the topic and the ids to a new topic. If ids is a string instead of an array, then only that one file is moved. The directory corresponding to the topic is deleted if empty. Returns an array of moved ids regardless of the ids argument being a string or an array.
 
-### delete(topic, id)
+### delete(topic, ids)
 
-Deletes the file specified by the topic and the id. The directory corresponding to the topic is deleted if empty. Returns true if the file was deleted, false if the file does not exist.
-
-### purge(topic, ids)
-
-Deletes all files for the specified topic and array of ids. The directory corresponding to the topic is deleted if empty. Returns an array of all removed ids.
+Deletes the files specified by the topic and the ids. If ids is a string instead of an array, then only that one file is deleted. The directory corresponding to the topic is deleted if empty. Returns an array of deleted ids regardless of the ids argument being a string or an array.
 
 ### clean(topic)
 
